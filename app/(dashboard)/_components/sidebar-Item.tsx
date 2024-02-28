@@ -26,7 +26,6 @@ const SidebarItem = ({ icon: Icon, label, href }: SidebarItemProps) => {
     >
       <Icon scale={22} />
       {label}
-      test
     </button>
   );
 };
