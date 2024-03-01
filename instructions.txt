@@ -1,0 +1,18 @@
+formating prisma files:
+"[prisma]": {
+  "editor.defaultFormatter": "Prisma.prisma"
+}
+
+steps:
+1 - npx prisma init (initialize prizma on the project)
+2 - npx prisma generate (Local)
+3 - npx prisma db push (push the db online)
+4 - npx prisma studio (visualize db tables on the browser )
+
+Create a new database with -+Supabase+-
+
+Go to Project Settings
+    / Database
+        / Connection string
+            / URI and copy the URI string
+            
