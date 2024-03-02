@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "LMS App",
-  description: "Learning Managment System app",
+  description: "Learning Managment System app V1",
 };
 
 export default function RootLayout({
