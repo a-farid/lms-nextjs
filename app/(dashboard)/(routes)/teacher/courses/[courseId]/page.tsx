@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
-import TitleForm from "./_components/title-form";
+import TitleFormPage from "./_components/titleForm";
 
 const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -44,7 +44,7 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
           <IconBadge size="sm" icon={LayoutDashboard} />
           <h2>Customize your course</h2>
         </div>
-        <TitleForm initialCourse={course} courseId={course.id} />
+        <TitleFormPage initialCourse={course} courseId={course.id} />
       </div>
     </div>
   );

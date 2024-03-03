@@ -49,6 +49,7 @@ const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
   const toggleEdit = () => {
     setIsEdited(!isEdited);
   };
+
   return (
     <div className="bg-slate-100 border border-md mt-6 p-4 w-[300px]">
       <div className="flex items-center justify-between font-medium w-full">
@@ -65,9 +66,21 @@ const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
       </div>
       {isEdited ? (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}></form>
-
-          <Input defaultValue={initialCourse.title} />
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormControl>
+                  <Input
+                    defaultValue={initialCourse.title}
+                    disabled={isSubmitting}
+                    {...field}
+                  />
+                </FormControl>
+              )}
+            />
+          </form>
         </Form>
       ) : (
         <>{initialCourse.title}</>
