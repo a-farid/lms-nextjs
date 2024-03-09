@@ -24,6 +24,7 @@ import * as z from "zod";
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
 });
+type formType = z.infer<typeof formSchema>;
 
 interface TitleFormProps {
   initialCourse: {
@@ -33,16 +34,28 @@ interface TitleFormProps {
 }
 // ==================== JSX ==========================
 const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const router = useRouter();
+  const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialCourse.title,
     },
   });
-  const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const {
+    handleSubmit,
+    formState: { isSubmitting, isValid },
+  } = form;
+
+  const onSubmit = async (values: formType) => {
+    try {
+      await axios.patch(`/api/courses/${courseId}`, values);
+      toast.success("Course title updated");
+      toggleEdit();
+      router.refresh();
+    } catch (error) {
+      toast.error("An error occurred");
+    }
   };
 
   const [isEdited, setIsEdited] = useState(false);
@@ -65,14 +78,35 @@ const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
       </div>
       {isEdited ? (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}></form>
-
-          <Input defaultValue={initialCourse.title} />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      disabled={isSubmitting}
+                      placeholder="e.g Web Development"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              disabled={!isValid || isSubmitting}
+              className="mt-4"
+              type="submit"
+            >
+              Save
+            </Button>
+          </form>
         </Form>
       ) : (
         <>{initialCourse.title}</>
       )}
-      {isEdited && <Button className="mt-4">Save</Button>}
     </div>
   );
 };
