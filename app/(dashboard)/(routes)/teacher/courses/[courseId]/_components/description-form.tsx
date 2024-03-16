@@ -10,11 +10,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Course } from "@prisma/client";
 import axios from "axios";
 import { Pencil } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,9 +28,7 @@ const formSchema = z.object({
 type formType = z.infer<typeof formSchema>;
 
 interface DescriptionFormProps {
-  initialCourse: {
-    description: string;
-  };
+  initialCourse: Course;
   courseId: string;
 }
 // ==================== JSX ==========================
@@ -38,7 +37,7 @@ const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: initialCourse.description,
+      description: initialCourse?.description || "",
     },
   });
 
@@ -50,7 +49,7 @@ const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
   const onSubmit = async (values: formType) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course title updated");
+      toast.success("Course description updated");
       toggleEdit();
       router.refresh();
     } catch (error) {
@@ -71,12 +70,20 @@ const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
             "Cancel"
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" /> Edit description
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit description
             </>
           )}
         </Button>
       </div>
-      {isEdited ? (
+      {!isEdited && (
+        <div
+          className={cn(!initialCourse.description && "text-slate-500 italic")}
+        >
+          {initialCourse.description || "No description"}
+        </div>
+      )}
+      {isEdited && (
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
             <FormField
@@ -85,9 +92,9 @@ const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
+                    <Textarea
                       disabled={isSubmitting}
-                      placeholder="e.g Web Development"
+                      placeholder="e.g This course will teach you how to..."
                       {...field}
                     />
                   </FormControl>
@@ -104,8 +111,6 @@ const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
             </Button>
           </form>
         </Form>
-      ) : (
-        <>{initialCourse.description}</>
       )}
     </div>
   );

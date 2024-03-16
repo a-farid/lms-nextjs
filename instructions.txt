@@ -15,4 +15,3 @@ Go to Project Settings
     / Database
         / Connection string
             / URI and copy the URI string
-            
