@@ -3,7 +3,10 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
-import TitleFormPage from "./_components/titleForm";
+import TitleForm from "./_components/title-form";
+import DescriptionForm from "./_components/description-form";
+import ImageForm from "./_components/image-form copy";
+import { CategoryForm } from "./_components/category-form";
 
 const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -14,8 +17,14 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
       id: params.courseId,
     },
   });
+
+  const categories = await db.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+
   if (!course) redirect("/");
-  // if (course?.userId != userId) redirect("/");
 
   const requiredFields = [
     course.title,
@@ -44,7 +53,17 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
           <IconBadge size="sm" icon={LayoutDashboard} />
           <h2>Customize your course</h2>
         </div>
-        <TitleFormPage initialCourse={course} courseId={course.id} />
+        <TitleForm initialCourse={course} courseId={course.id} />
+        <DescriptionForm initialCourse={course} courseId={course.id} />
+        <ImageForm initialCourse={course} courseId={course.id} />
+        <CategoryForm
+          initialCourse={course}
+          courseId={course.id}
+          options={categories.map((c) => ({
+            label: c.name,
+            value: c.id,
+          }))}
+        />
       </div>
     </div>
   );

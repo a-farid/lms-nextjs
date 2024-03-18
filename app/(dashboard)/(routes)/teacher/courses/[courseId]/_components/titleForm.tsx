@@ -49,7 +49,6 @@ const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
   const toggleEdit = () => {
     setIsEdited(!isEdited);
   };
-
   return (
     <div className="bg-slate-100 border border-md mt-6 p-4 w-[300px]">
       <div className="flex items-center justify-between font-medium w-full">
