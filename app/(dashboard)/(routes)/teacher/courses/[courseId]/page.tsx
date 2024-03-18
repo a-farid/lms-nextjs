@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import TitleForm from "./_components/title-form";
 import DescriptionForm from "./_components/description-form";
 import ImageForm from "./_components/image-form copy";
+import { CategoryForm } from "./_components/category-form";
 
 const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -22,6 +23,7 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
       name: "asc",
     },
   });
+
   if (!course) redirect("/");
 
   const requiredFields = [
@@ -54,6 +56,14 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
         <TitleForm initialCourse={course} courseId={course.id} />
         <DescriptionForm initialCourse={course} courseId={course.id} />
         <ImageForm initialCourse={course} courseId={course.id} />
+        <CategoryForm
+          initialCourse={course}
+          courseId={course.id}
+          options={categories.map((c) => ({
+            label: c.name,
+            value: c.id,
+          }))}
+        />
       </div>
     </div>
   );
