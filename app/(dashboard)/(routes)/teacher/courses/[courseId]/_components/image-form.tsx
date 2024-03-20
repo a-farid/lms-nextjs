@@ -21,7 +21,7 @@ interface ImageFormProps {
   courseId: string;
 }
 // ==================== JSX ==========================
-const ImageForm = ({ initialCourse, courseId }: ImageFormProps) => {
+export const ImageForm = ({ initialCourse, courseId }: ImageFormProps) => {
   const router = useRouter();
   const onSubmit = async (values: formType) => {
     try {
@@ -86,4 +86,3 @@ const ImageForm = ({ initialCourse, courseId }: ImageFormProps) => {
     </div>
   );
 };
-export default ImageForm;

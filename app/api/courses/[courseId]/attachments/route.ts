@@ -1,36 +1,29 @@
-import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
 
 export async function POST(
   req: Request,
   { params }: { params: { courseId: string } }
 ) {
   try {
-    const { userId } = auth();
-    const { title } = await req.json();
+    const values = await req.json();
     const { courseId } = params;
+    const { userId } = auth();
 
     if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-    const courseOwnet = await db.course.findFirst({
+    const course = await db.course.update({
       where: {
         id: courseId,
-      },
-    });
-    if (userId !== courseOwnet?.userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const course = await db.course.create({
-      data: {
         userId,
-        title,
       },
+      data: { ...values },
     });
+
     return NextResponse.json(course);
   } catch (error) {
-    console.log("[COURSES]:post", error);
+    console.log("[COURSE_ID_ATTACHMENTS]:post", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

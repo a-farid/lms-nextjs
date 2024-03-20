@@ -32,7 +32,10 @@ interface DescriptionFormProps {
   courseId: string;
 }
 // ==================== JSX ==========================
-const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
+export const DescriptionForm = ({
+  initialCourse,
+  courseId,
+}: DescriptionFormProps) => {
   const router = useRouter();
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
@@ -115,4 +118,3 @@ const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
     </div>
   );
 };
-export default DescriptionForm;
