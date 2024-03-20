@@ -11,10 +11,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { formatPrice } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Course } from "@prisma/client";
 import axios from "axios";
 import { Pencil } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -22,23 +25,21 @@ import toast from "react-hot-toast";
 import * as z from "zod";
 
 const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  price: z.coerce.number(),
 });
 type formType = z.infer<typeof formSchema>;
 
-interface TitleFormProps {
-  initialCourse: {
-    title: string;
-  };
+interface PriceFormProps {
+  initialCourse: Course;
   courseId: string;
 }
 // ==================== JSX ==========================
-export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
+export const PriceForm = ({ initialCourse, courseId }: PriceFormProps) => {
   const router = useRouter();
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: initialCourse.title,
+      price: initialCourse?.price || undefined,
     },
   });
 
@@ -50,7 +51,7 @@ export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
   const onSubmit = async (values: formType) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course title updated");
+      toast.success("Course price updated");
       toggleEdit();
       router.refresh();
     } catch (error) {
@@ -63,31 +64,39 @@ export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
     setIsEdited(!isEdited);
   };
   return (
-    <div className="bg-slate-100 border border-md mt-6 p-4 w-[300px]">
+    <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="flex items-center justify-between font-medium w-full">
-        Course title
+        Course price
         <Button variant="ghost" onClick={toggleEdit}>
           {isEdited ? (
             "Cancel"
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" /> Edit title
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit price
             </>
           )}
         </Button>
       </div>
-      {isEdited ? (
+      {!isEdited && (
+        <div className={cn(!initialCourse.price && "text-slate-500 italic")}>
+          {initialCourse.price ? formatPrice(initialCourse.price) : "Free"}
+        </div>
+      )}
+      {isEdited && (
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
             <FormField
               control={form.control}
-              name="title"
+              name="price"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <Input
+                      type="number"
+                      step={0.01}
                       disabled={isSubmitting}
-                      placeholder="e.g Web Development"
+                      placeholder="Set a price for your course"
                       {...field}
                     />
                   </FormControl>
@@ -104,8 +113,6 @@ export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
             </Button>
           </form>
         </Form>
-      ) : (
-        <>{initialCourse.title}</>
       )}
     </div>
   );

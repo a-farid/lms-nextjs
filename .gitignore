@@ -12,7 +12,8 @@
 # next.js
 /.next/
 /out/
-.test.js
+test.js
+test.py
 # production
 /build
 
@@ -35,3 +36,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+test.py

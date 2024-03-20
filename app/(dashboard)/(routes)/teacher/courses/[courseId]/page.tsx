@@ -1,12 +1,13 @@
 import { IconBadge } from "@/components/icon-badge";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
-import { LayoutDashboard } from "lucide-react";
+import { CircleDollarSign, LayoutDashboard, ListChecks } from "lucide-react";
 import { redirect } from "next/navigation";
+import { TitleForm } from "./_components/title-form";
 import DescriptionForm from "./_components/description-form";
 import ImageForm from "./_components/image-form copy";
 import { CategoryForm } from "./_components/category-form";
-import TitleForm from "./_components/titleForm";
+import { PriceForm } from "./_components/price-form";
 
 const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -39,7 +40,7 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
 
   const completionText = `(${completedFields}/${totalFields})`;
   return (
-    <div>
+    <div className="pb-4">
       <div className="flex items-center justify-between">
         <div className="flex gap-y-2  flex-col">
           <h1 className="text-2xl font-medium">Course Setup</h1>
@@ -48,22 +49,38 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-1  gap-6 mt-6">
-        <div className="flex items-center gap-x-2">
-          <IconBadge size="sm" icon={LayoutDashboard} />
-          <h2>Customize your course</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="space-y-6">
+          <div className="flex items-center gap-x-2">
+            <IconBadge size="sm" icon={LayoutDashboard} />
+            <h2 className="text-xl font-bold">Customize your course</h2>
+          </div>
+          <TitleForm initialCourse={course} courseId={course.id} />
+          <DescriptionForm initialCourse={course} courseId={course.id} />
+          <ImageForm initialCourse={course} courseId={course.id} />
+          <CategoryForm
+            initialCourse={course}
+            courseId={course.id}
+            options={categories.map((c) => ({
+              label: c.name,
+              value: c.id,
+            }))}
+          />
         </div>
-        <TitleForm initialCourse={course} courseId={course.id} />
-        <DescriptionForm initialCourse={course} courseId={course.id} />
-        <ImageForm initialCourse={course} courseId={course.id} />
-        <CategoryForm
-          initialCourse={course}
-          courseId={course.id}
-          options={categories.map((c) => ({
-            label: c.name,
-            value: c.id,
-          }))}
-        />
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge size="sm" icon={ListChecks} />
+              <h2 className="text-xl font-bold">Course chapters</h2>
+            </div>
+          </div>
+          <div>TODO: Course chapters</div>
+          <div className="flex items-center gap-x-2">
+            <IconBadge size="sm" icon={CircleDollarSign} />
+            <h2 className="text-xl font-bold">Sell your course</h2>
+          </div>
+          <PriceForm initialCourse={course} courseId={course.id} />
+        </div>
       </div>
     </div>
   );
