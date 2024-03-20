@@ -62,7 +62,7 @@ const DescriptionForm = ({ initialCourse, courseId }: DescriptionFormProps) => {
     setIsEdited(!isEdited);
   };
   return (
-    <div className="bg-slate-100 border border-md mt-6 p-4 w-[300px]">
+    <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="flex items-center justify-between font-medium w-full">
         Course description
         <Button variant="ghost" onClick={toggleEdit}>
