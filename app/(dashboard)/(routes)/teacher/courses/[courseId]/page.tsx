@@ -14,16 +14,24 @@ import { CategoryForm } from "./_components/category-form";
 import { PriceForm } from "./_components/price-form";
 import { TitleForm } from "./_components/titleForm";
 import { AttachmentForm } from "./_components/attachment-form";
+import { ChaptersForm } from "./_components/chapters-form";
 
 const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
+  const { courseId } = params;
   if (!userId) redirect("/");
 
   const course = await db.course.findUnique({
     where: {
-      id: params.courseId,
+      id: courseId,
+      userId,
     },
     include: {
+      chapters: {
+        orderBy: {
+          position: "asc",
+        },
+      },
       attachments: {
         orderBy: {
           createdAt: "desc",
@@ -46,6 +54,7 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
     course.imageUrl,
     course.price,
     course.categoryId,
+    course.chapters.some((chapter) => chapter.isPublished),
   ];
 
   const totalFields = requiredFields.length;
@@ -74,10 +83,7 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
           <CategoryForm
             initialCourse={course}
             courseId={course.id}
-            options={categories.map((c) => ({
-              label: c.name,
-              value: c.id,
-            }))}
+            options={categories.map((c) => ({ label: c.name, value: c.id }))}
           />
         </div>
         <div className="space-y-6">
@@ -87,7 +93,7 @@ const courseIdPage = async ({ params }: { params: { courseId: string } }) => {
               <h2 className="text-xl font-bold">Course chapters</h2>
             </div>
           </div>
-          <div>TODO: Course chapters</div>
+          <ChaptersForm initialCourse={course} courseId={course.id} />
           <div className="flex items-center gap-x-2">
             <IconBadge size="sm" icon={CircleDollarSign} />
             <h2 className="text-xl font-bold">Sell your course</h2>

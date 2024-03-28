@@ -11,10 +11,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Chapter, Course } from "@prisma/client";
 import axios from "axios";
-import { Pencil } from "lucide-react";
-import Link from "next/link";
+import { Pencil, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -22,23 +23,24 @@ import toast from "react-hot-toast";
 import * as z from "zod";
 
 const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  title: z.string().min(1),
 });
 type formType = z.infer<typeof formSchema>;
 
-interface TitleFormProps {
-  initialCourse: {
-    title: string;
-  };
+interface ChaptersFormProps {
+  initialCourse: Course & { chapters: Chapter[] };
   courseId: string;
 }
 // ==================== JSX ==========================
-export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
+export const ChaptersForm = ({
+  initialCourse,
+  courseId,
+}: ChaptersFormProps) => {
   const router = useRouter();
   const form = useForm<formType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: initialCourse.title,
+      title: "",
     },
   });
 
@@ -49,34 +51,52 @@ export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
 
   const onSubmit = async (values: formType) => {
     try {
-      await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course title updated");
-      toggleEdit();
+      await axios.post(`/api/courses/${courseId}/chapters`, values);
+      toast.success("Chapter created");
+      toggleCreating();
       router.refresh();
     } catch (error) {
       toast.error("An error occurred");
     }
   };
 
-  const [isEdited, setIsEdited] = useState(false);
-  const toggleEdit = () => {
-    setIsEdited(!isEdited);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const toggleCreating = () => {
+    setIsCreating(!isCreating);
   };
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="flex items-center justify-between font-medium w-full">
-        Course title
-        <Button variant="ghost" onClick={toggleEdit}>
-          {isEdited ? (
+        Course chapters
+        <Button variant="ghost" onClick={toggleCreating}>
+          {isCreating ? (
             "Cancel"
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" /> Edit title
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Add Chapter
             </>
           )}
         </Button>
       </div>
-      {isEdited ? (
+      {!isCreating && (
+        <div
+          className={cn(
+            "text-sm mt-2",
+            !initialCourse.chapters.length && "text-slate-500 italic"
+          )}
+        >
+          {!initialCourse.chapters.length && " No Chapters"}
+          {/* TODO: Add chapter list */}
+        </div>
+      )}
+      {!isCreating && (
+        <p className={cn("text-xs text-muted-foreground mt-4")}>
+          Drag and drop to reorder chapters
+        </p>
+      )}
+      {isCreating && (
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
             <FormField
@@ -87,7 +107,7 @@ export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="e.g Web Development"
+                      placeholder="e.g Introduction to the course"
                       {...field}
                     />
                   </FormControl>
@@ -100,12 +120,10 @@ export const TitleForm = ({ initialCourse, courseId }: TitleFormProps) => {
               className="mt-4"
               type="submit"
             >
-              Save
+              Create
             </Button>
           </form>
         </Form>
-      ) : (
-        <>{initialCourse.title}</>
       )}
     </div>
   );
